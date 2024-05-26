@@ -11,39 +11,41 @@
 // secret and the username of the secret.
 
 // 6. Listen on your predefined port and start the server.
-import express from "express"
-import bodyParser from "body-parser"
-import axios from "axios"
+import express from "express";
+import bodyParser from "body-parser";
+import axios from "axios";
 const app = express();
-const port = 3000;
+const PORT = 3000;
 
-;
-app.use(express.static("public"))
+
+
+app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.get("/",async (req, res) => {
-    const response = await axios.get('https://www.thecocktaildb.com/api/json/v1/1/random.php');
-    const drinks = response.data.drinks;
-    if (drinks && drinks.length > 0) {
-        const drinkName = drinks[0].strDrink;
-        const ingredients = [];
-      for (let i = 1; i <= 15; i++) {
-        const drink = drinks[0];
-        const ingredient = drink[`strIngredient${i}`]; 
-        const drinkThumb = drink.strDrinkThumb;
-        if (ingredient) {
-          ingredients.push(ingredient);
-        }
-         res.render("index.ejs",{drinkName: drinkName,ingredients:ingredients,drinkThumb:drinkThumb});
+
+// Route to render the main page
+
+app.set('view engine', 'ejs');
+
+app.get('/', async (req, res) => {
+  try {
+    const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+      params: {
+        vs_currency: 'usd'
       }
-          
-      } else {
-        console.log('No drinks found');
-      } 
+    });
 
- 
+    const data = response.data;
 
-  });
-  
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
+    // Render the HTML page with data
+    res.render('index', { coins: data });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).send('Error fetching data');
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+// Route to handle form submission and fetch weather data

@@ -1,88 +1,113 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>drinks</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Titan+One&display=swap"
-    rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Gloria Hallelujah', cursive;
-        background-color: #f4f4f9;
-        margin: 0;
-        padding: 20px;
-        text-align: center;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cryptocurrency Prices</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #e0f7fa;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
       }
-  
-      h1 {
-        color: #4CAF50;
-        font-family: 'Titan One', cursive;
-        font-size: 3em;
-        margin-bottom: 20px;
+      to {
+        opacity: 1;
       }
-  
-      .card {
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        display: inline-block;
-        margin: 20px;
-        max-width: 300px;
-        overflow: hidden;
-        padding: 20px;
-        text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        animation: fadeIn 1s ease-in-out;
-      }
-  
-      .card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      }
-  
-      .card img {
-        border-radius: 10px;
-        width: 100%;
-      }
-  
-      .card h3 {
-        color: #333;
-        font-size: 1.5em;
-        margin: 15px 0;
-      }
-  
-      .user {
-        color: #777;
-        font-size: 1.2em;
-        margin: 10px 0;
-      }
-  
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    </style>
+    }
+
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  </style>
 </head>
-
 <body>
-  <h1>What's your drink?</h1>
-  <div class="card">
-    <img src="<%= drinkThumb %>" alt="Drink Image" style="max-width: 100%;">
-    <h3>
-      <%=drinkName %>
-    </h3>
-  </div>
-  <h3 class="user">
-    <%= ingredients %>
-  </h3>
-</body>
+  <h1>Cryptocurrency Prices</h1>
+  <div id="crypto-prices"></div>
+  
+  <!-- Include React and ReactDOM -->
+  <script src="https://unpkg.com/react/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
 
+  <!-- React Component -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const CryptoPrices = () => {
+      const [coins, setCoins] = useState([]);
+
+      useEffect(() => {
+        fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd')
+          .then(response => response.json())
+          .then(data => setCoins(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }, []);
+
+      return (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>Current Price (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {coins.map(coin => (
+              <tr key={coin.id}>
+                <td>{coin.id}</td>
+                <td><img src={coin.image} alt={coin.id} /></td>
+                <td>${coin.current_price.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    };
+
+    ReactDOM.render(<CryptoPrices />, document.getElementById('crypto-prices'));
+  </script>
+</body>
 </html>
